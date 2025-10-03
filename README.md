@@ -58,7 +58,7 @@ npx @polkadot-api/check-runtime@latest problems wss://your.chain.rpc
 The CLI exposes a single subcommand (for now), `problems`, that inspects a live chain and/or a provided WASM artifact (that's applied at a certain state of the chain) and prints any detected issues.
 
 ```
-check-runtime problems <uri> [options]
+npx @polkadot-api/check-runtime@latest problems <uri> [options]
 ```
 
 - `<uri>`: WebSocket RPC endpoint of the chain, e.g. `wss://rpc.ibp.network/polkadot`.
