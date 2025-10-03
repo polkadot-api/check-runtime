@@ -1,0 +1,83 @@
+{
+  "name": "@polkadot-api/check-runtime",
+  "version": "0.0.1",
+  "author": "Josep M Sobrepere (https://github.com/josepot)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/polkadot-api/check-runtime.git"
+  },
+  "license": "MIT",
+  "sideEffects": false,
+  "bin": "./bin/cli.mjs",
+  "engines": {
+    "node": ">=v22"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "node": {
+        "import": "./dist/esm/index.mjs",
+        "require": "./dist/index.js",
+        "default": "./dist/index.js"
+      },
+      "module": "./dist/esm/index.mjs",
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/esm/index.mjs",
+  "browser": "./dist/esm/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "scripts": {
+    "build-core": "tsc --noEmit && rollup -c",
+    "build": "pnpm build-core",
+    "test": "echo 'no tests'",
+    "lint": "prettier --check README.md \"src/**/*.{js,jsx,ts,tsx,json,md}\"",
+    "format": "prettier --write README.md \"src/**/*.{js,jsx,ts,tsx,json,md}\"",
+    "prepack": "pnpm run build",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "@acala-network/chopsticks-core": "^1.2.2",
+    "@commander-js/extra-typings": "^14.0.0",
+    "@polkadot-api/json-rpc-provider-proxy": "^0.2.4",
+    "@polkadot-api/merkleize-metadata": "^1.1.25",
+    "@polkadot-api/substrate-bindings": "^0.16.3",
+    "@polkadot-labs/hdkd": "^0.0.25",
+    "@polkadot-labs/hdkd-helpers": "^0.0.26",
+    "ora": "^9.0.0",
+    "polkadot-api": "^1.19.1",
+    "rxjs": "^7.8.2"
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": false,
+    "trailingComma": "all",
+    "jsdocExperimentalFormatCommentsWithoutTags": true,
+    "plugins": [
+      "@homer0/prettier-plugin-jsdoc"
+    ]
+  },
+  "devDependencies": {
+    "@homer0/prettier-plugin-jsdoc": "^10.0.0",
+    "@rollup/plugin-alias": "^5.1.1",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.6",
+    "prettier": "^3.6.2",
+    "rollup": "^4.50.2",
+    "rollup-plugin-dts": "^6.2.3",
+    "rollup-plugin-esbuild": "^6.2.1",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.2"
+  },
+  "packageManager": "pnpm@10.18.0+sha512.e804f889f1cecc40d572db084eec3e4881739f8dec69c0ff10d2d1beff9a4e309383ba27b5b750059d7f4c149535b6cd0d2cb1ed3aeb739239a4284a68f40cfa"
+}
