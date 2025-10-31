@@ -95,7 +95,11 @@ function getCli() {
         problems.forEach((problem) => {
           console.warn(messages[problem])
         })
-        process.exit(1)
+        const exitCode =
+          problems.length === 1 && problems[0] === "DIFFERENT_METADATA_HASHES"
+            ? 0
+            : 1
+        process.exit(exitCode)
       }
       spinner.succeed("Everything looks great!")
       process.exit(0)
