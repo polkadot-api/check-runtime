@@ -15,6 +15,7 @@ type Problem = (typeof Problem)[keyof typeof Problem];
 declare const getProblems: (uri: string, options?: Partial<{
     wasm: HexString;
     block: HexString | number;
+    timeout: number;
     token: Partial<{
         symbol: string;
         decimals: number;

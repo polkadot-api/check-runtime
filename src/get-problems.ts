@@ -19,6 +19,7 @@ export const getProblems = async (
   options: Partial<{
     wasm: HexString
     block: HexString | number
+    timeout: number
     token: Partial<{
       symbol: string
       decimals: number
@@ -31,7 +32,10 @@ export const getProblems = async (
   let metadataRaw: Uint8Array
 
   try {
-    client = await getChopsticksClient(uri, options)
+    client = await getChopsticksClient(uri, {
+      ...options,
+      timeoutMs: options.timeout,
+    })
   } catch {
     return [Problem.UNREACHABLE]
   }

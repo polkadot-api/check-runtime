@@ -43,6 +43,7 @@ function getCli() {
       "--decimals <decimals>",
       "The number of decimals of the native token. If not provided, it will be obtained from the RPC chainspec",
     )
+    .option("--timeout <seconds>", "Connection timeout in seconds", "30")
     .action(async (uri, options) => {
       let wasm: HexString | undefined = undefined
       if (options.wasm) {
@@ -80,6 +81,7 @@ function getCli() {
       const problems = await getProblems(uri, {
         wasm,
         block: options.at,
+        timeout: Number(options.timeout) * 1000,
         token: {
           decimals:
             options.decimals !== undefined

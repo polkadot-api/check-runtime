@@ -127,39 +127,62 @@ export const getChopsticksClient = async (
   options: Partial<{
     wasm: HexString
     block: string | number
+    timeoutMs: number
   }> = {},
 ) => {
   const client = createClient(getChopsticksProvider(uri, options))
-  const api = client.getUnsafeApi<Dot>()
-  const [aliceStorageKey, ed] = await Promise.all([
-    api.query.System.Account.getKey(alice.address),
-    api.constants.Balances.ExistentialDeposit(),
-  ])
-  await client._request("dev_setStorage", [
-    [
-      [
-        aliceStorageKey,
-        toHex(
-          encAccount({
-            nonce: 1,
-            consumers: 1,
-            providers: 1,
-            sufficients: 0,
-            data: {
-              free: ed * 1_000n,
-              reserved: 0n,
-              frozen: 0n,
-              flags: 170141183460469231731687303715884105728n,
-            },
-          }),
-        ),
-      ],
-    ],
-  ])
-  await client._request("dev_newBlock", [])
+  const timeoutMs = options.timeoutMs ?? 30_000
+  let timer: ReturnType<typeof setTimeout>
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(
+      () => reject(new Error("Connection timed out")),
+      timeoutMs,
+    )
+  })
 
-  return {
-    ...client,
-    api,
+  try {
+    const api = await Promise.race([
+      (async () => {
+        const api = client.getUnsafeApi<Dot>()
+        const [aliceStorageKey, ed] = await Promise.all([
+          api.query.System.Account.getKey(alice.address),
+          api.constants.Balances.ExistentialDeposit(),
+        ])
+        await client._request("dev_setStorage", [
+          [
+            [
+              aliceStorageKey,
+              toHex(
+                encAccount({
+                  nonce: 1,
+                  consumers: 1,
+                  providers: 1,
+                  sufficients: 0,
+                  data: {
+                    free: ed * 1_000n,
+                    reserved: 0n,
+                    frozen: 0n,
+                    flags: 170141183460469231731687303715884105728n,
+                  },
+                }),
+              ),
+            ],
+          ],
+        ])
+        await client._request("dev_newBlock", [])
+        return api
+      })(),
+      timeout,
+    ])
+
+    return {
+      ...client,
+      api,
+    }
+  } catch (err) {
+    client.destroy()
+    throw err
+  } finally {
+    clearTimeout(timer!)
   }
 }

@@ -14,7 +14,10 @@ const getProblems = async (uri, options = {}) => {
   let metadata;
   let metadataRaw;
   try {
-    client = await getChopsticksClient(uri, options);
+    client = await getChopsticksClient(uri, {
+      ...options,
+      timeoutMs: options.timeout
+    });
   } catch {
     return [Problem.UNREACHABLE];
   }

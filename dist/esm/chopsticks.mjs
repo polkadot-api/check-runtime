@@ -103,37 +103,58 @@ const [encAccount] = Struct({
 });
 const getChopsticksClient = async (uri, options = {}) => {
   const client = createClient(getChopsticksProvider(uri, options));
-  const api = client.getUnsafeApi();
-  const [aliceStorageKey, ed] = await Promise.all([
-    api.query.System.Account.getKey(alice.address),
-    api.constants.Balances.ExistentialDeposit()
-  ]);
-  await client._request("dev_setStorage", [
-    [
-      [
-        aliceStorageKey,
-        toHex(
-          encAccount({
-            nonce: 1,
-            consumers: 1,
-            providers: 1,
-            sufficients: 0,
-            data: {
-              free: ed * 1000n,
-              reserved: 0n,
-              frozen: 0n,
-              flags: 170141183460469231731687303715884105728n
-            }
-          })
-        )
-      ]
-    ]
-  ]);
-  await client._request("dev_newBlock", []);
-  return {
-    ...client,
-    api
-  };
+  const timeoutMs = options.timeoutMs ?? 3e4;
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(
+      () => reject(new Error("Connection timed out")),
+      timeoutMs
+    );
+  });
+  try {
+    const api = await Promise.race([
+      (async () => {
+        const api2 = client.getUnsafeApi();
+        const [aliceStorageKey, ed] = await Promise.all([
+          api2.query.System.Account.getKey(alice.address),
+          api2.constants.Balances.ExistentialDeposit()
+        ]);
+        await client._request("dev_setStorage", [
+          [
+            [
+              aliceStorageKey,
+              toHex(
+                encAccount({
+                  nonce: 1,
+                  consumers: 1,
+                  providers: 1,
+                  sufficients: 0,
+                  data: {
+                    free: ed * 1000n,
+                    reserved: 0n,
+                    frozen: 0n,
+                    flags: 170141183460469231731687303715884105728n
+                  }
+                })
+              )
+            ]
+          ]
+        ]);
+        await client._request("dev_newBlock", []);
+        return api2;
+      })(),
+      timeout
+    ]);
+    return {
+      ...client,
+      api
+    };
+  } catch (err) {
+    client.destroy();
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
 };
 
 export { getChopsticksClient };
