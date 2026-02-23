@@ -1,6 +1,7 @@
 import { HexString } from 'polkadot-api';
 
 declare const Problem: {
+    readonly UNREACHABLE: "UNREACHABLE";
     readonly ANCIENT_METADATA: "ANCIENT_METADATA";
     readonly MISSING_MODERN_METADATA: "MISSING_MODERN_METADATA";
     readonly MISSING_RUNTIME_APIS: "MISSING_RUNTIME_APIS";

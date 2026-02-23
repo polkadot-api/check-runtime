@@ -15,13 +15,17 @@ const getProblems = async (uri, options = {}) => {
   let metadataRaw;
   try {
     client = await getChopsticksClient(uri, options);
+  } catch {
+    return [Problem.UNREACHABLE];
+  }
+  try {
     metadataRaw = await client.getMetadata(
       (await client.getFinalizedBlock()).hash
     );
     metadata = unifyMetadata(decAnyMetadata(metadataRaw));
   } catch {
     try {
-      client?.destroy();
+      client.destroy();
     } catch {
     }
     return [Problem.ANCIENT_METADATA];

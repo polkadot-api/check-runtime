@@ -9,6 +9,7 @@ import ora from "ora"
 import { Problem } from "./problems"
 import { version } from "../package.json"
 const messages: Record<Problem, string> = {
+  [Problem.UNREACHABLE]: "The RPC endpoint is unreachable",
   [Problem.ANCIENT_METADATA]:
     "This runtime doesn't expose a modern (>=14) metadata",
   [Problem.MISSING_RUNTIME_APIS]: `The runtime APIs are missing. Plese have a look at this: https://github.com/polkadot-api/polkadot-api/issues/1164#issuecomment-3332177905`,

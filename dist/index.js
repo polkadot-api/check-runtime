@@ -178,6 +178,7 @@ const getChopsticksClient = async (uri, options = {}) => {
 };
 
 const Problem = {
+  UNREACHABLE: "UNREACHABLE",
   ANCIENT_METADATA: "ANCIENT_METADATA",
   MISSING_MODERN_METADATA: "MISSING_MODERN_METADATA",
   MISSING_RUNTIME_APIS: "MISSING_RUNTIME_APIS",
@@ -194,13 +195,17 @@ const getProblems = async (uri, options = {}) => {
   let metadataRaw;
   try {
     client = await getChopsticksClient(uri, options);
+  } catch {
+    return [Problem.UNREACHABLE];
+  }
+  try {
     metadataRaw = await client.getMetadata(
       (await client.getFinalizedBlock()).hash
     );
     metadata = substrateBindings.unifyMetadata(substrateBindings.decAnyMetadata(metadataRaw));
   } catch {
     try {
-      client?.destroy();
+      client.destroy();
     } catch {
     }
     return [Problem.ANCIENT_METADATA];
